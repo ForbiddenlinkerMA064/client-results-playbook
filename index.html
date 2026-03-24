@@ -1393,6 +1393,124 @@ body::before {
   color: var(--text-secondary);
   line-height: 1.5;
 }
+/* ═══════════════════════════════════════════
+   RESPONSIVE — TABLET (max 1024px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .hero-stats { gap: 2rem; }
+  .system-layers { grid-template-columns: 1fr; gap: 1.25rem; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .highlight-row { grid-template-columns: 1fr; }
+  .leads-grid { grid-template-columns: 1fr; }
+  .icp-grid { grid-template-columns: 1fr; }
+  .case-metrics { grid-template-columns: 1fr; }
+  .before-after { grid-template-columns: 1fr; }
+  .screenshot-gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE (max 600px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .container { padding: 0 1.25rem; }
+  .section-pad { padding: clamp(2.5rem, 8vh, 4rem) 0; }
+
+  /* Nav */
+  .nav-inner { padding: 0 1.25rem; }
+  .nav-logo { font-size: 0.7rem; }
+  .nav-cta { padding: 0.5rem 1rem; font-size: 0.65rem; }
+
+  /* Hero */
+  .hero { min-height: 90vh; padding-top: 5rem; }
+  .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  .hero-sub { font-size: 0.95rem; }
+  .hero-eyebrow { font-size: 0.7rem !important; letter-spacing: 0.2em !important; }
+  .hero-stats { flex-direction: column; gap: 1.25rem; }
+  .hero-stat-number { font-size: 2rem; }
+  .hero-stat-label { font-size: 0.72rem; }
+  .scroll-indicator { display: none; }
+
+  /* Proof bar */
+  .proof-scroll .company { font-size: 0.6rem; }
+
+  /* Metrics */
+  .metrics-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .metric-number { font-size: 2rem; }
+  .metric-label { font-size: 0.72rem; }
+
+  /* Case studies */
+  .case-client-name { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+  .case-tagline { font-size: 0.9rem; }
+  .case-meta { flex-direction: column; gap: 0.5rem; }
+  .case-metrics { grid-template-columns: 1fr; gap: 1rem; }
+  .case-metric-value { font-size: 1.5rem; }
+
+  /* Before/After */
+  .before-after { grid-template-columns: 1fr; gap: 1rem; }
+  .ba-header { padding: 0.75rem 1rem; flex-wrap: wrap; }
+  .ba-stat { padding: 0.75rem 1rem; }
+  .ba-stat-value { font-size: 1.1rem; }
+  .ba-stat-label { font-size: 0.78rem; }
+
+  /* Screenshots */
+  .screenshot-gallery { grid-template-columns: 1fr; gap: 1rem; }
+  .ss-card img { aspect-ratio: auto; }
+
+  /* Highlight rows */
+  .highlight-row { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Leads */
+  .leads-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .lead-card-body h4 { font-size: 0.95rem; }
+
+  /* Timeline */
+  .timeline { padding-left: 1.5rem; }
+
+  /* Section headers */
+  .section-header h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .section-header .section-sub { font-size: 0.88rem; }
+
+  /* Callout */
+  .callout { padding: 1.25rem; }
+  .callout p { font-size: 1rem; padding-left: 1.5rem; }
+  .callout::before { font-size: 3rem; left: 0.75rem; }
+
+  /* System layers */
+  .system-layers { grid-template-columns: 1fr; gap: 1rem; }
+  .layer-card h3 { font-size: 1.3rem; }
+
+  /* ICP */
+  .icp-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Companies */
+  .companies-grid { gap: 0.4rem; }
+  .company-chip { font-size: 0.6rem; padding: 0.4rem 0.75rem; }
+
+  /* CTA */
+  .cta-section h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .cta-button { padding: 0.9rem 2rem; font-size: 0.88rem; }
+  .cta-sub { font-size: 0.9rem; }
+
+  /* Lightbox */
+  .lightbox { padding: 1rem; }
+  .lightbox img { max-width: 95vw; max-height: 85vh; border-radius: 8px; }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — SMALL MOBILE (max 380px)
+   ═══════════════════════════════════════════ */
+@media (max-width: 380px) {
+  .container { padding: 0 1rem; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero-stat-number { font-size: 1.6rem; }
+  .metric-number { font-size: 1.6rem; }
+  .case-client-name { font-size: 1.6rem; }
+  .case-metric-value { font-size: 1.3rem; }
+  .section-header h2 { font-size: 1.4rem; }
+  .nav-logo { font-size: 0.6rem; }
+  .nav-cta { font-size: 0.6rem; padding: 0.4rem 0.8rem; }
+  .company-chip { font-size: 0.55rem; padding: 0.3rem 0.6rem; }
+}
 </style>
 </head>
 <body>
