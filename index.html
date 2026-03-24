@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forbidden Linker — Client Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & FOUNDATIONS
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-void: #060608;
+  --bg-deep: #0a0a0f;
+  --bg-surface: #111118;
+  --bg-card: #16161f;
+  --bg-elevated: #1c1c28;
+
+  --text-primary: #eeeef0;
+  --text-secondary: #8a8a9a;
+  --text-muted: #55556a;
+
+  --accent-cyan: #00d4ff;
+  --accent-blue: #3355ff;
+  --accent-purple: #8b5cf6;
+  --accent-amber: #f59e0b;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+
+  --gradient-main: linear-gradient(135deg, #00d4ff 0%, #3355ff 50%, #8b5cf6 100%);
+  --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --gradient-glow: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(51,85,255,0.15) 100%);
+
+  --glass-bg: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.06);
+  --glass-hover: rgba(255,255,255,0.07);
+
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--bg-void);
+}
+
+::selection {
+  background: rgba(0,212,255,0.25);
+  color: var(--text-primary);
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ═══════════════════════════════════════════
+   NOISE TEXTURE OVERLAY
+   ═══════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ═══════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+}
+
+.section-pad {
+  padding: clamp(4rem, 10vh, 8rem) 0;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 12px var(--accent-cyan);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.gradient-text {
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL ANIMATIONS
+   ═══════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1.2rem 0;
+  transition: all 0.4s var(--ease-out-expo);
+  backdrop-filter: blur(0px);
+}
+
+.nav.scrolled {
+  background: rgba(6,6,8,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0.8rem 0;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.nav-logo span { color: var(--accent-cyan); }
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 0.3s;
+  letter-spacing: 0.02em;
+}
+
+.nav-links a:hover { color: var(--text-primary); }
+
+.nav-cta {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid rgba(0,212,255,0.3);
+  border-radius: 100px;
+  color: var(--accent-cyan);
+  transition: all 0.3s;
+}
+
+.nav-cta:hover {
+  background: rgba(0,212,255,0.1);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(0,212,255,0.15);
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 6rem;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+}
+
+.hero-bg .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+.hero-bg .orb-1 {
+  width: 600px; height: 600px;
+  background: var(--accent-cyan);
+  top: -200px; right: -100px;
+  animation-delay: 0s;
+}
+
+.hero-bg .orb-2 {
+  width: 500px; height: 500px;
+  background: var(--accent-purple);
+  bottom: -150px; left: -100px;
+  animation-delay: -7s;
+}
+
+.hero-bg .orb-3 {
+  width: 300px; height: 300px;
+  background: var(--accent-blue);
+  top: 40%; left: 40%;
+  animation-delay: -14s;
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+.hero-grid-lines {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: clamp(0.65rem, 1vw, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--accent-cyan);
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  max-width: 900px;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 em {
+  font-style: italic;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin-bottom: 3rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: clamp(2rem, 4vw, 4rem);
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  position: relative;
+}
+
+.hero-stat-number {
+  font-family: var(--mono);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 600;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.hero-stat-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  letter-spacing: 0.02em;
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-family: var(--mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: bounce-down 2s ease-in-out infinite;
+}
+
+.scroll-indicator .line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--text-muted), transparent);
+}
+
+@keyframes bounce-down {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* ═══════════════════════════════════════════
+   SOCIAL PROOF BAR
+   ═══════════════════════════════════════════ */
+.proof-bar {
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--bg-deep);
+  padding: 2rem 0;
+  overflow: hidden;
+}
+
+.proof-scroll {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  animation: scroll-left 30s linear infinite;
+  width: max-content;
+}
+
+.proof-scroll .company {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.proof-scroll .company:hover { opacity: 1; }
+
+.proof-scroll .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.3;
+  flex-shrink: 0;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════════
+   METRICS SECTION
+   ═══════════════════════════════════════════ */
+.metrics-section {
+  background: var(--bg-deep);
+  position: relative;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.metric-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  text-align: center;
+  transition: all 0.4s var(--ease-out-expo);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--gradient-main);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.metric-card:hover {
+  background: var(--glass-hover);
+  transform: translateY(-4px);
+  border-color: rgba(0,212,255,0.15);
+}
+
+.metric-card:hover::before { opacity: 1; }
+
+.metric-number {
+  font-family: var(--mono);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-suffix {
+  font-size: 0.6em;
+  opacity: 0.7;
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  letter-spacing: 0.03em;
+}
+
+.metric-sub {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--accent-green);
+  margin-top: 0.35rem;
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════════
+   CASE STUDY SECTIONS
+   ═══════════════════════════════════════════ */
+.case-study {
+  position: relative;
+}
+
+.case-study + .case-study {
+  border-top: 1px solid var(--glass-border);
+}
+
+.case-header {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.case-client-name {
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+
+.case-tagline {
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.case-meta {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.case-meta-item {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.case-meta-item strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Before/After Grid */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .before-after { grid-template-columns: 1fr; }
+}
+
+.ba-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.ba-card:hover {
+  border-color: rgba(0,212,255,0.15);
+  transform: translateY(-2px);
+}
+
+.ba-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.ba-badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: 100px;
+}
+
+.ba-badge.before {
+  background: rgba(239,68,68,0.1);
+  color: var(--accent-red);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+
+.ba-badge.after {
+  background: rgba(16,185,129,0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+.ba-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ba-image {
+  padding: 0;
+  background: #f5f5f5;
+}
+
+.ba-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ba-stat {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--glass-border);
+}
+
+.ba-stat-value {
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.ba-stat-value.red { color: var(--accent-red); }
+.ba-stat-value.green { color: var(--accent-green); }
+
+.ba-stat-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Screenshot Gallery */
+.screenshot-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 900px) {
+  .screenshot-gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 550px) {
+  .screenshot-gallery { grid-template-columns: 1fr; }
+}
+
+.ss-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out-expo);
+  cursor: pointer;
+}
+
+.ss-card:hover {
+  border-color: rgba(0,212,255,0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.ss-card img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  object-position: top;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.ss-card .ss-caption {
+  padding: 0.9rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.ss-card .ss-metric {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  display: block;
+  margin-top: 0.3rem;
+}
+
+/* Lead Cards */
+.leads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+.lead-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.lead-card:hover {
+  border-color: rgba(245,158,11,0.2);
+  background: var(--glass-hover);
+}
+
+.lead-card-header {
+  padding: 1.25rem 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lead-source {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 100px;
+  background: rgba(245,158,11,0.1);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.lead-country {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.lead-card-body {
+  padding: 1rem 1.5rem 1.25rem;
+}
+
+.lead-card-body h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.lead-card-body p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.lead-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Case Study Metrics Row */
+.case-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 600px) {
+  .case-metrics { grid-template-columns: 1fr; }
+}
+
+.case-metric {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.case-metric::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient-main);
+  opacity: 0.5;
+}
+
+.case-metric-value {
+  font-family: var(--mono);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.case-metric-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.case-metric-change {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--accent-green);
+  margin-top: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════
+   COMPANIES SECTION
+   ═══════════════════════════════════════════ */
+.companies-section {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--glass-border);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.companies-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  max-width: 800px;
+  margin: 2rem auto 0;
+}
+
+.company-chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  transition: all 0.3s;
+}
+
+.company-chip:hover {
+  border-color: rgba(0,212,255,0.2);
+  color: var(--text-primary);
+  background: rgba(0,212,255,0.05);
+}
+
+.company-chip.highlight {
+  border-color: rgba(0,212,255,0.2);
+  color: var(--accent-cyan);
+  background: rgba(0,212,255,0.05);
+}
+
+/* ═══════════════════════════════════════════
+   THE SYSTEM SECTION
+   ═══════════════════════════════════════════ */
+.system-section {
+  background: var(--bg-void);
+}
+
+.system-layers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+@media (max-width: 768px) {
+  .system-layers { grid-template-columns: 1fr; }
+}
+
+.layer-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  transition: all 0.4s var(--ease-out-expo);
+  position: relative;
+  overflow: hidden;
+}
+
+.layer-card:hover {
+  background: var(--glass-hover);
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.layer-number {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.layer-number .num {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.layer-card:nth-child(1) .num {
+  background: rgba(0,212,255,0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0,212,255,0.2);
+}
+
+.layer-card:nth-child(2) .num {
+  background: rgba(139,92,246,0.1);
+  color: var(--accent-purple);
+  border: 1px solid rgba(139,92,246,0.2);
+}
+
+.layer-card:nth-child(3) .num {
+  background: rgba(245,158,11,0.1);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.layer-card h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.layer-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+.layer-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layer-items li {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.layer-items li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  opacity: 0.5;
+}
+
+.layer-card:nth-child(2) .layer-items li::before { background: var(--accent-purple); }
+.layer-card:nth-child(3) .layer-items li::before { background: var(--accent-amber); }
+
+.layer-timeline {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+/* ═══════════════════════════════════════════
+   ICP SECTION
+   ═══════════════════════════════════════════ */
+.icp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+
+@media (max-width: 700px) {
+  .icp-grid { grid-template-columns: 1fr; }
+}
+
+.icp-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.icp-card:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+.icp-icon {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.icp-card h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.icp-card .icp-problem {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.icp-card .icp-outcome {
+  font-size: 0.82rem;
+  color: var(--accent-green);
+  font-weight: 500;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(16,185,129,0.3);
+}
+
+/* ═══════════════════════════════════════════
+   CTA SECTION
+   ═══════════════════════════════════════════ */
+.cta-section {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center, rgba(0,212,255,0.06) 0%, transparent 60%);
+}
+
+.cta-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cta-section h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.cta-section .cta-sub {
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  border-radius: 100px;
+  background: var(--gradient-main);
+  color: white;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-expo);
+  text-decoration: none;
+  box-shadow: 0 0 40px rgba(0,212,255,0.15);
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 40px rgba(0,212,255,0.3);
+}
+
+.cta-button svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s;
+}
+
+.cta-button:hover svg {
+  transform: translateX(3px);
+}
+
+.cta-trust {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════ */
+.footer {
+  padding: 3rem 0;
+  border-top: 1px solid var(--glass-border);
+  text-align: center;
+}
+
+.footer p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.footer .footer-brand {
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ═══════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════ */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════
+   LIGHTBOX
+   ═══════════════════════════════════════════ */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(20px);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  cursor: zoom-out;
+}
+
+.lightbox.active {
+  display: flex;
+  animation: fade-in 0.3s ease;
+}
+
+.lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════
+   QUOTE / CALLOUT
+   ═══════════════════════════════════════════ */
+.callout {
+  background: var(--gradient-glow);
+  border: 1px solid rgba(0,212,255,0.1);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  margin: 3rem 0;
+  position: relative;
+}
+
+.callout::before {
+  content: '"';
+  font-family: var(--serif);
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--accent-cyan);
+  opacity: 0.3;
+  position: absolute;
+  top: 0.5rem;
+  left: 1.5rem;
+}
+
+.callout p {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-primary);
+  padding-left: 2rem;
+}
+
+.callout cite {
+  display: block;
+  font-style: normal;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  padding-left: 2rem;
+}
+
+/* ═══════════════════════════════════════════
+   TIMELINE
+   ═══════════════════════════════════════════ */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+  margin: 2rem 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple), transparent);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 0.4rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0,212,255,0.4);
+  transform: translateX(-4px);
+}
+
+.timeline-date {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 0.35rem;
+}
+
+.timeline-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.timeline-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION HEADERS
+   ═══════════════════════════════════════════ */
+.section-header {
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.section-header h2 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+  margin-top: 0.75rem;
+}
+
+.section-header .section-sub {
+  font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+  color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+/* ═══════════════════════════════════════════
+   HIGHLIGHT ROW (for key screenshots)
+   ═══════════════════════════════════════════ */
+.highlight-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 700px) {
+  .highlight-row { grid-template-columns: 1fr; }
+}
+
+.highlight-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.highlight-card:hover {
+  border-color: rgba(0,212,255,0.15);
+  transform: translateY(-2px);
+}
+
+.highlight-card img {
+  width: 100%;
+  height: auto;
+}
+
+.highlight-info {
+  padding: 1.25rem 1.5rem;
+}
+
+.highlight-info h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.highlight-info p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVIGATION
+     ═══════════════════════════════════════════ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">Forbidden <span>Linker</span></div>
+    <ul class="nav-links">
+      <li><a href="#results">Results</a></li>
+      <li><a href="#gopal">Gopal</a></li>
+      <li><a href="#jay">Jay</a></li>
+      <li><a href="#arkesh">Arkesh</a></li>
+      <li><a href="#system">System</a></li>
+    </ul>
+    <a href="#cta" class="nav-cta">Book a Call</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="hero-grid-lines"></div>
+  </div>
+  <div class="container hero-content">
+    <div class="hero-eyebrow reveal" style="font-size:clamp(0.85rem,1.5vw,1.1rem);font-weight:800;letter-spacing:0.3em;">Client Results Playbook</div>
+    <h1 class="reveal reveal-delay-1">I build LinkedIn systems that<br>generate <em>inbound leads</em></h1>
+    <p class="hero-sub reveal reveal-delay-2">Not followers. Not impressions. Real inbound messages from qualified prospects who want to work with my clients.</p>
+    <div class="hero-stats reveal reveal-delay-3">
+      <div class="hero-stat">
+        <div class="hero-stat-number" data-target="44452" data-suffix="+">0</div>
+        <div class="hero-stat-label">Total Impressions Generated</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number" data-target="86861">0</div>
+        <div class="hero-stat-label">Peak Profile Appearances / Week</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-number" data-target="15" data-suffix="">0</div>
+        <div class="hero-stat-label">Paying Clients for One Profile</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    scroll
+    <div class="line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     COMPANY PROOF BAR
+     ═══════════════════════════════════════════ -->
+<div class="proof-bar">
+  <div class="proof-scroll">
+    <span class="company">JPMorgan Chase</span><span class="dot"></span>
+    <span class="company">Amazon</span><span class="dot"></span>
+    <span class="company">Citi</span><span class="dot"></span>
+    <span class="company">Accenture</span><span class="dot"></span>
+    <span class="company">Deloitte</span><span class="dot"></span>
+    <span class="company">Infosys</span><span class="dot"></span>
+    <span class="company">TCS</span><span class="dot"></span>
+    <span class="company">Standard Chartered</span><span class="dot"></span>
+    <span class="company">Morgan Stanley</span><span class="dot"></span>
+    <span class="company">HCLTech</span><span class="dot"></span>
+    <span class="company">Publicis Sapient</span><span class="dot"></span>
+    <span class="company">Cognizant</span><span class="dot"></span>
+    <span class="company">UBS</span><span class="dot"></span>
+    <span class="company">NXP Semiconductors</span><span class="dot"></span>
+    <span class="company">Agoda</span><span class="dot"></span>
+    <span class="company">A.Team (Silicon Valley)</span><span class="dot"></span>
+    <!-- Duplicate for seamless loop -->
+    <span class="company">JPMorgan Chase</span><span class="dot"></span>
+    <span class="company">Amazon</span><span class="dot"></span>
+    <span class="company">Citi</span><span class="dot"></span>
+    <span class="company">Accenture</span><span class="dot"></span>
+    <span class="company">Deloitte</span><span class="dot"></span>
+    <span class="company">Infosys</span><span class="dot"></span>
+    <span class="company">TCS</span><span class="dot"></span>
+    <span class="company">Standard Chartered</span><span class="dot"></span>
+    <span class="company">Morgan Stanley</span><span class="dot"></span>
+    <span class="company">HCLTech</span><span class="dot"></span>
+    <span class="company">Publicis Sapient</span><span class="dot"></span>
+    <span class="company">Cognizant</span><span class="dot"></span>
+    <span class="company">UBS</span><span class="dot"></span>
+    <span class="company">NXP Semiconductors</span><span class="dot"></span>
+    <span class="company">Agoda</span><span class="dot"></span>
+    <span class="company">A.Team (Silicon Valley)</span><span class="dot"></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     AGGREGATE METRICS
+     ═══════════════════════════════════════════ -->
+<section class="metrics-section section-pad" id="results">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="label">Aggregate Results</span>
+      <h2>Numbers that matter.<br><span class="gradient-text">Not vanity metrics.</span></h2>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card reveal reveal-delay-1">
+        <div class="metric-number"><span data-target="44452" class="counter">0</span><span class="metric-suffix">+</span></div>
+        <div class="metric-label">Impressions Generated</div>
+        <div class="metric-sub">+18,499% vs prior period</div>
+      </div>
+      <div class="metric-card reveal reveal-delay-2">
+        <div class="metric-number"><span data-target="86861" class="counter">0</span></div>
+        <div class="metric-label">Profile Appearances / Week</div>
+        <div class="metric-sub">From 341 baseline</div>
+      </div>
+      <div class="metric-card reveal reveal-delay-3">
+        <div class="metric-number"><span data-target="5" class="counter">0</span><span class="metric-suffix">+</span></div>
+        <div class="metric-label">Inbound Leads Generated</div>
+        <div class="metric-sub">Belgium, UK, Silicon Valley, India</div>
+      </div>
+      <div class="metric-card reveal reveal-delay-4">
+        <div class="metric-number"><span data-target="3" class="counter">0</span></div>
+        <div class="metric-label">Clients Transformed</div>
+        <div class="metric-sub">Developer, Tech Lead, Freelancer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     CASE STUDY 1: GOPAL
+     ═══════════════════════════════════════════ -->
+<section class="case-study section-pad" id="gopal">
+  <div class="container">
+    <div class="case-header reveal">
+      <span class="label">Case Study 01</span>
+      <h2 class="case-client-name">Gopal Sabhadiya</h2>
+      <p class="case-tagline">Senior Backend Architect. 8 years experience. Invisible on LinkedIn with 634 followers and zero strategy. We turned his profile into a lead machine that attracted JPMorgan, Amazon, Agoda, and Silicon Valley startups.</p>
+      <div class="case-meta">
+        <div class="case-meta-item"><strong>Timeline:</strong> 8 weeks</div>
+        <div class="case-meta-item"><strong>Role:</strong> Backend Architect, Toptal Top 3%</div>
+        <div class="case-meta-item"><strong>Starting Followers:</strong> 634</div>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="case-metrics reveal">
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="44452" class="counter">0</span></div>
+        <div class="case-metric-label">Total Content Impressions</div>
+        <div class="case-metric-change">+18,499.2% vs prior 61 days</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="86861" class="counter">0</span></div>
+        <div class="case-metric-label">Profile Appearances / Week</div>
+        <div class="case-metric-change">From 341 — that's a 254x increase</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="1110" class="counter">0</span></div>
+        <div class="case-metric-label">Profile Viewers (90 Days)</div>
+        <div class="case-metric-change">+2,900% from 37 baseline</div>
+      </div>
+    </div>
+
+    <!-- Before / After: Impressions -->
+    <div class="before-after reveal">
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge before">Before</span>
+          <span class="ba-title">Content Performance — Starting Point</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Content performance Before.png" alt="Gopal content performance before — 7 impressions baseline on Jan 23" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">Impressions on Jan 23</span>
+          <span class="ba-stat-value red">7</span>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge after">After</span>
+          <span class="ba-title">Content Performance — 8 Weeks Later</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Content performance After.png" alt="Gopal content performance after — 44,452 impressions" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">Impressions by March 24</span>
+          <span class="ba-stat-value green">44,452</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Before / After: Engagements -->
+    <div class="before-after reveal">
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge before">Before</span>
+          <span class="ba-title">Post Engagements — Starting at Zero</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Posts Engagements Before.png" alt="Gopal post engagements before — 0 engagements on Jan 23" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">Engagements on Jan 23</span>
+          <span class="ba-stat-value red">0</span>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge after">After</span>
+          <span class="ba-title">Post Engagements — 8 Weeks Later</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Post Engagements After.png" alt="Gopal post engagements after — 440 engagements" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">Total Engagements</span>
+          <span class="ba-stat-value green">440</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post 1 Deep Dive -->
+    <div class="callout reveal">
+      <p>His first-ever LinkedIn post hit 28,784 impressions, 104 reactions, and 45 saves — on an account with just 654 followers. That single post drove 344 profile views and 55 new followers.</p>
+      <cite>Post 1 — "3 AM. Production Down. $50M Payment System."</cite>
+    </div>
+
+    <!-- Screenshot Gallery -->
+    <div class="screenshot-gallery reveal">
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/First Post analytics.png" alt="Gopal first post analytics — 28,784 impressions" loading="lazy">
+        <div class="ss-caption">
+          First Post Analytics
+          <span class="ss-metric">28,784 impressions / 104 reactions / 45 saves</span>
+        </div>
+      </div>
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/Profile appearence on 6th March.jpeg" alt="Gopal 86,861 profile appearances" loading="lazy">
+        <div class="ss-caption">
+          86,861 Profile Appearances
+          <span class="ss-metric">Single week — March 6, 2026</span>
+        </div>
+      </div>
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/Profile Appearances on 17-24 Feb.jpeg" alt="Gopal 33,208 appearances Feb 17-24" loading="lazy">
+        <div class="ss-caption">
+          33,208 Weekly Appearances
+          <span class="ss-metric">+532% in 7 days / 79.3% from posts</span>
+        </div>
+      </div>
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/Final Analytics and Leads.png" alt="Gopal social engagement — 305 reactions, 56 saves, 26 sends" loading="lazy">
+        <div class="ss-caption">
+          Social Engagement Breakdown
+          <span class="ss-metric">305 reactions / 56 saves / 26 sends on LinkedIn</span>
+        </div>
+      </div>
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/Profile Views All in one..png" alt="Gopal 1,110 profile viewers" loading="lazy">
+        <div class="ss-caption">
+          1,110 Profile Viewers
+          <span class="ss-metric">Past 90 days — from 37 baseline</span>
+        </div>
+      </div>
+      <div class="ss-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/Side Quest Post analytics.png" alt="Gopal side quest post — 11,654 impressions, 198 reactions" loading="lazy">
+        <div class="ss-caption">
+          Second Viral Post
+          <span class="ss-metric">11,654 impressions / 198 reactions / 292 profile viewers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Followers Before/After -->
+    <div class="before-after reveal">
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge before">Before</span>
+          <span class="ba-title">Follower Growth — Flatline</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Followers Before.png" alt="Gopal followers before — zero new followers on Jan 23" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">New followers on Jan 23</span>
+          <span class="ba-stat-value red">0</span>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-header">
+          <span class="ba-badge after">After</span>
+          <span class="ba-title">Follower Growth — Hockey Stick</span>
+        </div>
+        <div class="ba-image">
+          <img src="Leads generated by me/Gopal's results/Followers after.png" alt="Gopal followers after — 261 new followers, 848 total, 41% Senior" loading="lazy">
+        </div>
+        <div class="ba-stat">
+          <span class="ba-stat-label">New followers gained / Senior-level</span>
+          <span class="ba-stat-value green">261 / 41% Senior</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comment Power -->
+    <div class="callout reveal">
+      <p>A single strategic comment on someone else's post generated 54,254 impressions for Gopal. More reach than most people's posts get in a year. That's the comment engine at work.</p>
+      <cite>Comment on a system design post — "Solid list. One thing to add, case studies without failure models are incomplete."</cite>
+    </div>
+
+    <div class="highlight-row reveal">
+      <div class="highlight-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Gopal's results/WhatsApp Image 2026-03-01 at 00.28.00.jpeg" alt="Gopal comment gaining 54,254 impressions" loading="lazy">
+        <div class="highlight-info">
+          <h4>54,254 Impressions from One Comment</h4>
+          <p>Strategic commenting on Dream 100 targets drives massive profile traffic without publishing a single post.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div class="highlight-card" onclick="openLightbox(this)" style="margin:0;">
+          <img src="Leads generated by me/Gopal's results/These Companies recuiters Reviewed His profile.png" alt="Companies reviewing Gopal's profile — JPMorgan, Infosys, TCS, Amazon, Accenture" loading="lazy">
+          <div class="highlight-info">
+            <h4>Who's Looking at His Profile</h4>
+            <p>JPMorgan 9.8%, Infosys 9.8%, TCS 8.9%, Amazon 4.5%, Accenture 7.1%, Citi 3.6%, Deloitte 3.5%</p>
+          </div>
+        </div>
+        <div class="highlight-card" onclick="openLightbox(this)" style="margin:0;">
+          <img src="Leads generated by me/Gopal's results/These Companies recuiters Reviewed His profile - 02.png" alt="More companies — HCLTech, GlobalLogic, NXP Semiconductors, Standard Chartered, Coforge" loading="lazy">
+          <div class="highlight-info">
+            <h4>More Enterprise Viewers</h4>
+            <p>HCLTech, GlobalLogic, NXP Semiconductors, Standard Chartered, Coforge — all viewing organically.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+          <div class="case-metric">
+            <div class="case-metric-value">18,499<span style="font-size:0.7em;color:var(--accent-cyan);">%</span></div>
+            <div class="case-metric-label">Impression Growth</div>
+            <div class="case-metric-change">7 → 44,452 in 61 days</div>
+          </div>
+          <div class="case-metric">
+            <div class="case-metric-value">254<span style="font-size:0.7em;color:var(--accent-cyan);">x</span></div>
+            <div class="case-metric-label">Profile Appearance Multiplier</div>
+            <div class="case-metric-change">341 → 86,861 per week</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inbound Leads -->
+    <div class="section-header reveal" style="margin-top:3rem;">
+      <span class="label">Inbound Leads</span>
+      <h2>They came to <em class="gradient-text">him</em></h2>
+      <p class="section-sub">4 qualified inbound leads from 4 different countries. No cold outreach. No paid ads. Just a properly positioned LinkedIn profile and strategic content.</p>
+    </div>
+
+    <div class="leads-grid reveal">
+      <div class="lead-card" onclick="openLightbox(this)">
+        <div class="lead-card-header">
+          <span class="lead-source">Inbound DM</span>
+          <span class="lead-country">Belgium</span>
+        </div>
+        <div class="lead-card-body">
+          <h4>Hema Guddanti — NRX Digital</h4>
+          <p>Fullstack Developer opportunity in Belgium's banking sector. Java, Spring Boot, ReactJS. Reached out before any content was published — profile optimization alone.</p>
+        </div>
+        <img src="Leads generated by me/Gopal's results/Gopal's Lead 01.jpeg" alt="Hema Guddanti inbound lead from Belgium — Fullstack Developer at NRX Digital" loading="lazy">
+      </div>
+      <div class="lead-card" onclick="openLightbox(this)">
+        <div class="lead-card-header">
+          <span class="lead-source">Inbound DM</span>
+          <span class="lead-country">Silicon Valley, USA</span>
+        </div>
+        <div class="lead-card-body">
+          <h4>Ben Striar — A.Team</h4>
+          <p>VC-backed reinforcement learning startup. Hiring senior DevOps/Backend talent. Found Gopal through LinkedIn. Curated Silicon Valley talent platform.</p>
+        </div>
+        <img src="Leads generated by me/Gopal's results/Gopal's Lead 02.jpeg" alt="Ben Striar from A.Team Silicon Valley — recruiting senior backend talent" loading="lazy">
+      </div>
+      <div class="lead-card" onclick="openLightbox(this)">
+        <div class="lead-card-header">
+          <span class="lead-source">Inbound DM</span>
+          <span class="lead-country">India — Agoda + Contract</span>
+        </div>
+        <div class="lead-card-body">
+          <h4>Saba Shaikh — Agoda (Booking Holdings)</h4>
+          <p>Staff Software Engineer — Backend position. Also: Neha Sharma with a Java Full Stack Developer contract at 1.2L/month. Two leads in one screenshot.</p>
+        </div>
+        <img src="Leads generated by me/Gopal's results/Gopal's Lead 03.jpeg" alt="Saba Shaikh from Agoda and Neha Sharma — dual inbound leads" loading="lazy">
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="section-header reveal" style="margin-top:2rem;">
+      <span class="label">Timeline</span>
+      <h2>8 weeks. Zero to <span class="gradient-text">everything.</span></h2>
+    </div>
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-date">Week 1-2</div>
+        <div class="timeline-title">Profile Overhaul</div>
+        <div class="timeline-desc">Complete rewrite of headline, about, experience. Conversion-optimized for his ICP. Featured section with case studies. Banner designed.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Week 3</div>
+        <div class="timeline-title">Comment Engine Activated</div>
+        <div class="timeline-desc">Strategic commenting on Dream 100 targets. Profile views started climbing. First inbound lead arrived — from Belgium. Before any post was published.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Week 4</div>
+        <div class="timeline-title">First Post Goes Viral</div>
+        <div class="timeline-desc">"3 AM. Production down." — 28,784 impressions. 104 reactions. 45 saves. 344 profile viewers. 55 new followers. On a 654-follower account.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Week 5-6</div>
+        <div class="timeline-title">Lead Machine Activated</div>
+        <div class="timeline-desc">Silicon Valley startup (A.Team) reaches out. Profile appearances hit 86,861/week. JPMorgan, Amazon, Citi recruiters viewing the profile.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Week 7-8</div>
+        <div class="timeline-title">Compounding Results</div>
+        <div class="timeline-desc">44,452 total impressions. 1,110 profile viewers. Agoda (Booking Holdings) reaches out for Staff Engineer role. Second post hits 11,654 impressions with 198 reactions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     CASE STUDY 2: JAY
+     ═══════════════════════════════════════════ -->
+<section class="case-study section-pad" id="jay">
+  <div class="container">
+    <div class="case-header reveal">
+      <span class="label">Case Study 02</span>
+      <h2 class="case-client-name">Jay Gorfad</h2>
+      <p class="case-tagline">Freelance developer stuck at zero visibility. No profile views, no inbound leads, no online presence. In 4 months, he went from invisible to landing 15 paying clients — all through LinkedIn.</p>
+      <div class="case-meta">
+        <div class="case-meta-item"><strong>Timeline:</strong> 4 months</div>
+        <div class="case-meta-item"><strong>Role:</strong> Freelance Developer</div>
+        <div class="case-meta-item"><strong>Starting Profile Views:</strong> ~0/month</div>
+      </div>
+    </div>
+
+    <div class="case-metrics reveal">
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="1109" class="counter">0</span></div>
+        <div class="case-metric-label">Profile Viewers (Year)</div>
+        <div class="case-metric-change">Sustained traffic over 12 months</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="2609" class="counter">0</span></div>
+        <div class="case-metric-label">Followers Built</div>
+        <div class="case-metric-change">+135.9% impression growth this week</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="15" class="counter">0</span></div>
+        <div class="case-metric-label">Paying Clients Landed</div>
+        <div class="case-metric-change">In 4 months — all from LinkedIn</div>
+      </div>
+    </div>
+
+    <div class="highlight-row reveal">
+      <div class="highlight-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Jay's Results/WhatsApp Image 2026-03-24 at 17.24.55.jpeg" alt="Jay Gorfad analytics — 2,609 followers, 332 profile viewers, 125 post impressions" loading="lazy">
+        <div class="highlight-info">
+          <h4>Jay's Current Dashboard</h4>
+          <p>2,609 followers. 332 profile viewers (90 days). 125 impressions this week (+135.9%). The system keeps compounding even months later.</p>
+        </div>
+      </div>
+      <div class="highlight-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Jay's Results/WhatsApp Image 2026-03-24 at 17.24.56.jpeg" alt="Jay Gorfad profile views — 1,109 viewers over 365 days, consistent traffic" loading="lazy">
+        <div class="highlight-info">
+          <h4>Consistent Traffic Over 12 Months</h4>
+          <p>1,109 profile viewers over the past year. +109% this week. The system we built continues to drive traffic long after the initial engagement.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <p>Jay went from zero profile views to 15 paying clients in 4 months. He didn't run ads. He didn't cold DM thousands of people. He had a properly built LinkedIn system that made clients come to him.</p>
+      <cite>The blueprint that proved the Forbidden Linker system works.</cite>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     CASE STUDY 3: ARKESH
+     ═══════════════════════════════════════════ -->
+<section class="case-study section-pad" id="arkesh">
+  <div class="container">
+    <div class="case-header reveal">
+      <span class="label">Case Study 03</span>
+      <h2 class="case-client-name">Arkesh Kalathiya</h2>
+      <p class="case-tagline">Technical Lead in Canada. 8+ years experience. Profile scored 3.2 out of 10. Within weeks of optimization, comments started getting thousands of impressions and recruiters came knocking with remote opportunities.</p>
+      <div class="case-meta">
+        <div class="case-meta-item"><strong>Timeline:</strong> 3 weeks (setup only)</div>
+        <div class="case-meta-item"><strong>Role:</strong> Technical Lead, Full Stack Developer</div>
+        <div class="case-meta-item"><strong>Location:</strong> Alberta, Canada</div>
+        <div class="case-meta-item"><strong>Profile Score:</strong> 3.2/10 → Optimized</div>
+      </div>
+    </div>
+
+    <div class="case-metrics reveal">
+      <div class="case-metric">
+        <div class="case-metric-value">3.2 <span style="font-size:0.7em;color:var(--accent-cyan);margin:0 0.15em;">&#10132;</span> <span style="color:var(--accent-green);">Optimized</span></div>
+        <div class="case-metric-label">Profile Score Transformation</div>
+        <div class="case-metric-change">Complete profile overhaul</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value"><span data-target="4351" class="counter">0</span></div>
+        <div class="case-metric-label">Impressions from One Comment</div>
+        <div class="case-metric-change">Strategic comment engine activated</div>
+      </div>
+      <div class="case-metric">
+        <div class="case-metric-value">1</div>
+        <div class="case-metric-label">Inbound Recruiter Lead</div>
+        <div class="case-metric-change">100% remote Senior SWE role</div>
+      </div>
+    </div>
+
+    <div class="highlight-row reveal">
+      <div class="highlight-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Arkesh's Results/Arkesh's First Comment Response.png" alt="Arkesh comment gaining 4,351 impressions" loading="lazy">
+        <div class="highlight-info">
+          <h4>4,351 Impressions from First Strategic Comment</h4>
+          <p>Within weeks of activation. Comment on an Atlassian layoffs post about git history — genuine, technical, and it got noticed. 13 reactions, 4 comments.</p>
+        </div>
+      </div>
+      <div class="highlight-card" onclick="openLightbox(this)">
+        <img src="Leads generated by me/Arkesh's Results/Arkesh's First Inbound Lead.png" alt="Arkesh inbound lead — Senior Software Engineer 100% remote role from Umar Bukhari" loading="lazy">
+        <div class="highlight-info">
+          <h4>First Inbound Recruiter — Remote SWE Role</h4>
+          <p>Umar Bukhari reached out for a Senior Software Engineer position at a software consulting firm. 100% remote. Canada-wide. Java, Spring, AWS, PyTorch — perfect match.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout reveal">
+      <p>Arkesh was referred by Gopal — after seeing what the system did for Gopal's profile. The first USD client. Proof that results generate referrals, and referrals close faster than cold outreach.</p>
+      <cite>Referral conversion — Gopal's results sold the service without a pitch.</cite>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     COMPANIES SECTION
+     ═══════════════════════════════════════════ -->
+<section class="companies-section section-pad">
+  <div class="container" style="text-align:center;">
+    <div class="section-header reveal" style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+      <span class="label">Profile Viewers</span>
+      <h2>Recruiters from these companies<br>reviewed my clients' profiles</h2>
+    </div>
+    <div class="companies-grid reveal">
+      <span class="company-chip highlight">JPMorgan Chase</span>
+      <span class="company-chip highlight">Amazon</span>
+      <span class="company-chip highlight">Citi</span>
+      <span class="company-chip highlight">Agoda</span>
+      <span class="company-chip">Accenture</span>
+      <span class="company-chip">Deloitte</span>
+      <span class="company-chip">Infosys</span>
+      <span class="company-chip">TCS</span>
+      <span class="company-chip">Morgan Stanley</span>
+      <span class="company-chip">UBS</span>
+      <span class="company-chip">Standard Chartered</span>
+      <span class="company-chip">HCLTech</span>
+      <span class="company-chip">Cognizant</span>
+      <span class="company-chip">Publicis Sapient</span>
+      <span class="company-chip">NXP Semiconductors</span>
+      <span class="company-chip">GlobalLogic</span>
+      <span class="company-chip highlight">A.Team (Silicon Valley)</span>
+      <span class="company-chip">einfochips</span>
+      <span class="company-chip">VOLANSYS</span>
+      <span class="company-chip">Altimetrik</span>
+      <span class="company-chip">Coforge</span>
+      <span class="company-chip">Bacancy</span>
+      <span class="company-chip">Paytm</span>
+      <span class="company-chip">Manhattan Associates</span>
+      <span class="company-chip">Tech Mahindra</span>
+      <span class="company-chip">Capgemini</span>
+      <span class="company-chip">LTIMindtree</span>
+      <span class="company-chip">Redwood Software</span>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     THE SYSTEM
+     ═══════════════════════════════════════════ -->
+<section class="system-section section-pad" id="system">
+  <div class="container">
+    <div class="section-header reveal" style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+      <span class="label">The System</span>
+      <h2>Three layers.<br><span class="gradient-text">One revenue machine.</span></h2>
+      <p class="section-sub" style="text-align:center;">Every client gets the same system. The pitch changes based on who you are. The machine underneath is identical — and it compounds over time.</p>
+    </div>
+
+    <div class="system-layers">
+      <div class="layer-card reveal reveal-delay-1">
+        <div class="layer-number"><span class="num">1</span> Foundation</div>
+        <h3>Profile as a<br>Landing Page</h3>
+        <p>Your LinkedIn profile is a conversion page. Not a resume. We rebuild it to answer one question: "Why should I work with this person?"</p>
+        <ul class="layer-items">
+          <li>Headline = outcome statement + searchable keywords</li>
+          <li>About section in answer-block format with clear CTA</li>
+          <li>Featured section = proof, case studies, lead magnets</li>
+          <li>AI-search optimized so ChatGPT recommends you</li>
+        </ul>
+        <div class="layer-timeline">Week 1-2</div>
+      </div>
+      <div class="layer-card reveal reveal-delay-2">
+        <div class="layer-number"><span class="num">2</span> Authority Engine</div>
+        <h3>Content that<br>generates leads</h3>
+        <p>3x/week content in your authentic voice. Every post has a lead-gen angle. Story hooks over advice. Specific numbers over vague claims.</p>
+        <ul class="layer-items">
+          <li>Story-driven posts (41x more reach than advice posts)</li>
+          <li>Strategic comment engine on Dream 100 targets</li>
+          <li>Engagement strategy driving profile views</li>
+          <li>Every post moves someone closer to your DMs</li>
+        </ul>
+        <div class="layer-timeline">Week 2-8</div>
+      </div>
+      <div class="layer-card reveal reveal-delay-3">
+        <div class="layer-number"><span class="num">3</span> Lead Machine</div>
+        <h3>Inbound leads<br>on autopilot</h3>
+        <p>The profile converts visitors. The content drives visitors. The system compounds. Inbound leads start arriving within 30-45 days.</p>
+        <ul class="layer-items">
+          <li>Inbound DMs from profile + content authority</li>
+          <li>Warm introductions from Dream 100 network</li>
+          <li>Referrals from happy clients (Arkesh came from Gopal)</li>
+          <li>Track: leads → calls booked → deals closed</li>
+        </ul>
+        <div class="layer-timeline">Week 4+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     WHO THIS IS FOR
+     ═══════════════════════════════════════════ -->
+<section class="section-pad">
+  <div class="container">
+    <div class="section-header reveal" style="text-align:center;display:flex;flex-direction:column;align-items:center;">
+      <span class="label">Ideal Clients</span>
+      <h2>Built for people who are<br><span class="gradient-text">great at what they do</span></h2>
+      <p class="section-sub" style="text-align:center;">But invisible on the platform where their next client, job, or investor is already looking.</p>
+    </div>
+
+    <div class="icp-grid">
+      <div class="icp-card reveal reveal-delay-1">
+        <span class="icp-icon">&#9883;</span>
+        <h4>Freelancers & Developers</h4>
+        <p class="icp-problem">Invisible to global recruiters. Stuck at local rates. Can't break into international markets despite having the skills.</p>
+        <p class="icp-outcome">Inbound project offers from companies like JPMorgan, Amazon, and A.Team — without cold outreach.</p>
+      </div>
+      <div class="icp-card reveal reveal-delay-2">
+        <span class="icp-icon">&#9878;</span>
+        <h4>CTOs & Tech Founders</h4>
+        <p class="icp-problem">Building a company but nobody knows. Can't attract talent, investors, or strategic partnerships at scale.</p>
+        <p class="icp-outcome">Become the person everyone in your industry wants to work with. Talent and investors come to you.</p>
+      </div>
+      <div class="icp-card reveal reveal-delay-3">
+        <span class="icp-icon">&#9853;</span>
+        <h4>Consultants & Fractionals</h4>
+        <p class="icp-problem">Feast-famine cycle. Living on referrals with no predictable pipeline. Every month starts from scratch.</p>
+        <p class="icp-outcome">3-5 qualified inbound leads per month. Predictable pipeline. Stop chasing — make them chase you.</p>
+      </div>
+      <div class="icp-card reveal reveal-delay-4">
+        <span class="icp-icon">&#9776;</span>
+        <h4>Agency Owners</h4>
+        <p class="icp-problem">Competing on price. No differentiation. Can't land enterprise clients or escape the race to the bottom.</p>
+        <p class="icp-outcome">Premium positioning that kills price competition. Attract clients who pay for value, not hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     CTA SECTION
+     ═══════════════════════════════════════════ -->
+<section class="cta-section section-pad" id="cta">
+  <div class="container cta-content">
+    <div class="reveal">
+      <span class="label" style="justify-content:center;">Next Step</span>
+      <h2 style="margin-top:0.75rem;">Ready to build your<br><em style="font-style:italic;" class="gradient-text">lead machine?</em></h2>
+      <p class="cta-sub">DM me "PROFILE" on LinkedIn for a free diagnostic. I'll tell you exactly what's broken and what it's costing you. No pitch. Just diagnosis.</p>
+      <a href="https://linkedin.com/in/yash-limbachiya" target="_blank" class="cta-button">
+        DM me on LinkedIn
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+      </a>
+      <p class="cta-trust">I take a maximum of 5 clients at a time. Currently have 3 spots open.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <p><span class="footer-brand">Forbidden Linker</span></p>
+    <p style="margin-top:0.5rem;">LinkedIn Lead Generation & Revenue System</p>
+    <p style="margin-top:0.25rem;">Yash Limbachiya — Surat, India</p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     LIGHTBOX
+     ═══════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="Enlarged screenshot">
+</div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════ -->
+<script>
+// ─── Scroll Reveal ───
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ─── Animated Counters ───
+function animateCounter(el, target, duration = 2200) {
+  let start = null;
+  const step = (timestamp) => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    // Ease out expo
+    const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+    el.textContent = Math.floor(eased * target).toLocaleString('en-IN');
+    if (progress < 1) requestAnimationFrame(step);
+    else {
+      el.textContent = target.toLocaleString('en-IN');
+      // Add suffix if parent has one
+      const suffix = el.dataset.suffix || el.closest('.metric-number, .hero-stat-number')?.querySelector('.metric-suffix')?.textContent;
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.dataset.counted) {
+      entry.target.dataset.counted = 'true';
+      const target = parseInt(entry.target.dataset.target || entry.target.textContent);
+      if (target) animateCounter(entry.target, target);
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.counter, .hero-stat-number[data-target]').forEach(el => {
+  counterObserver.observe(el);
+});
+
+// ─── Navbar scroll effect ───
+const nav = document.getElementById('nav');
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const currentScroll = window.scrollY;
+  if (currentScroll > 80) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+  lastScroll = currentScroll;
+}, { passive: true });
+
+// ─── Lightbox ───
+function openLightbox(card) {
+  const img = card.querySelector('img');
+  if (!img) return;
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightbox-img');
+  lbImg.src = img.src;
+  lbImg.alt = img.alt;
+  lightbox.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ─── Smooth anchor links ───
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
