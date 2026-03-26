@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="100%" style="stop-color:#111118"/>
+    </linearGradient>
+    <linearGradient id="main" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="50%" style="stop-color:#3355ff"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.1"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#00d4ff" flood-opacity="0.4"/>
+    </filter>
+    <filter id="innerGlow">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#3355ff" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- Subtle glow backdrop -->
+  <circle cx="256" cy="240" r="160" fill="url(#glow)"/>
+
+  <!-- Chain link 1 (top-left) — rotated -->
+  <g transform="translate(256, 220) rotate(-45)" filter="url(#shadow)">
+    <rect x="-90" y="-32" width="130" height="64" rx="32" fill="none" stroke="url(#main)" stroke-width="14"/>
+  </g>
+
+  <!-- Chain link 2 (bottom-right) — rotated, interlocked -->
+  <g transform="translate(256, 260) rotate(-45)" filter="url(#shadow)">
+    <rect x="-40" y="-32" width="130" height="64" rx="32" fill="none" stroke="url(#main)" stroke-width="14"/>
+  </g>
+
+  <!-- Strike-through / "Forbidden" slash -->
+  <g filter="url(#innerGlow)">
+    <line x1="160" y1="340" x2="352" y2="148" stroke="#ef4444" stroke-width="16" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- "FL" monogram text -->
+  <text x="256" y="440" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="72" fill="url(#main)" letter-spacing="12" filter="url(#innerGlow)">FL</text>
+</svg>
